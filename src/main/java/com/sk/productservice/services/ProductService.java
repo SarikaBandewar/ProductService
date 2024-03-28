@@ -19,8 +19,11 @@ public interface ProductService {
 
     List<Product> getProductsOfCategory(String category);
 
-    Product createProduct(FakeStoreProductDto product);
+    Product createProduct(ProductDto productDto);
 
     Product replaceProduct(Long id, ProductDto productDto);
 
+    Product updateProduct(Long id, ProductDto productDto);
+
+    Boolean deleteProduct(Long id);
 }

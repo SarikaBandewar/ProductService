@@ -77,19 +77,41 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public Product createProduct(FakeStoreProductDto product) {
+    public Product createProduct(ProductDto productDto) {
+        Product product = convertProductDtoToProduct(productDto);
 
-        FakeStoreProductDto fakeStoreProductDto = restTemplate.postForObject("https://fakestoreapi.com/products", product, FakeStoreProductDto.class);
-
-        if(fakeStoreProductDto == null)
-            return null;
-
-        return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+        return restTemplate.postForObject("https://fakestoreapi.com/products", product, Product.class);// convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
     }
 
     @Override
     public Product replaceProduct(Long id, ProductDto productDto) {
 
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(productDto, ProductDto.class);
+        HttpMessageConverterExtractor<FakeStoreProductDto> responseExtractor = new HttpMessageConverterExtractor(FakeStoreProductDto.class, restTemplate.getMessageConverters());
+        FakeStoreProductDto fakeStoreProductDto =  restTemplate.execute("https://fakestoreapi.com/products/"+id, HttpMethod.PUT, requestCallback, responseExtractor);
+        return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+    }
+
+    @Override
+    public Product updateProduct(Long id, ProductDto productDto) {
+
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(productDto, ProductDto.class);
+        HttpMessageConverterExtractor<FakeStoreProductDto> responseExtractor = new HttpMessageConverterExtractor(FakeStoreProductDto.class, restTemplate.getMessageConverters());
+        FakeStoreProductDto fakeStoreProductDto =  restTemplate.execute("https://fakestoreapi.com/products/"+id, HttpMethod.PATCH, requestCallback, responseExtractor);
+        return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+    }
+
+    @Override
+    public Boolean deleteProduct(Long id) {
+        try {
+            restTemplate.delete("https://fakestoreapi.com/products/"+id);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    private Product convertProductDtoToProduct(ProductDto productDto) {
         Product product = new Product();
         product.setTitle(productDto.getTitle());
         product.setPrice(productDto.getPrice());
@@ -98,11 +120,7 @@ public class FakeStoreProductService implements ProductService{
         Category category = new Category();
         category.setTitle(productDto.getCategory());
         product.setCategory(category);
-
-        RequestCallback requestCallback = restTemplate.httpEntityCallback(product, FakeStoreProductDto.class);
-        HttpMessageConverterExtractor<FakeStoreProductDto> responseExtractor = new HttpMessageConverterExtractor(FakeStoreProductDto.class, restTemplate.getMessageConverters());
-        FakeStoreProductDto fakeStoreProductDto =  restTemplate.execute("https://fakestoreapi.com/products/"+id, HttpMethod.PUT, requestCallback, responseExtractor);
-        return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+        return product;
     }
 
     private List<Product> getProducts(ResponseEntity<FakeStoreProductDto[]> fakeStoreProductDtoList) {

@@ -44,19 +44,12 @@ public class ProductController {
 
     @PostMapping
     public Product createProduct(@RequestBody ProductDto productDto) {
-        FakeStoreProductDto product = new FakeStoreProductDto();
-        product.setCategory(productDto.getCategory());
-        product.setTitle(productDto.getTitle());
-        product.setPrice(productDto.getPrice());
-        product.setImage(productDto.getImage());
-        product.setDescription(productDto.getDescription());
-
-        return productService.createProduct(product);
+        return productService.createProduct(productDto);
     }
 
     @PatchMapping("/{id}")
-    public Product updateProduct(@PathVariable("id") Long id, @RequestBody Product product) {
-        return new Product();
+    public Product updateProduct(@PathVariable("id") Long id, @RequestBody ProductDto productDto) {
+        return productService.updateProduct(id, productDto);
     }
 
     @PutMapping("/{id}")
@@ -65,7 +58,9 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
-
+    public ResponseEntity<Boolean> deleteProduct(@PathVariable Long id) {
+        Boolean response = productService.deleteProduct(id);
+        if (response) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
