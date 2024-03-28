@@ -1,6 +1,5 @@
 package com.sk.productservice.controllers;
 
-import com.sk.productservice.dto.FakeStoreProductDto;
 import com.sk.productservice.dto.ProductDto;
 import com.sk.productservice.models.Category;
 import com.sk.productservice.models.Product;

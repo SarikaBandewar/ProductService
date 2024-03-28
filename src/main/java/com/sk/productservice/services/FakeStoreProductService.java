@@ -12,7 +12,6 @@ import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -87,7 +86,7 @@ public class FakeStoreProductService implements ProductService{
     public Product replaceProduct(Long id, ProductDto productDto) {
 
         RequestCallback requestCallback = restTemplate.httpEntityCallback(productDto, ProductDto.class);
-        HttpMessageConverterExtractor<FakeStoreProductDto> responseExtractor = new HttpMessageConverterExtractor(FakeStoreProductDto.class, restTemplate.getMessageConverters());
+        HttpMessageConverterExtractor<FakeStoreProductDto> responseExtractor = new HttpMessageConverterExtractor<>(FakeStoreProductDto.class, restTemplate.getMessageConverters());
         FakeStoreProductDto fakeStoreProductDto =  restTemplate.execute("https://fakestoreapi.com/products/"+id, HttpMethod.PUT, requestCallback, responseExtractor);
         return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
     }
@@ -96,7 +95,7 @@ public class FakeStoreProductService implements ProductService{
     public Product updateProduct(Long id, ProductDto productDto) {
 
         RequestCallback requestCallback = restTemplate.httpEntityCallback(productDto, ProductDto.class);
-        HttpMessageConverterExtractor<FakeStoreProductDto> responseExtractor = new HttpMessageConverterExtractor(FakeStoreProductDto.class, restTemplate.getMessageConverters());
+        HttpMessageConverterExtractor<FakeStoreProductDto> responseExtractor = new HttpMessageConverterExtractor<>(FakeStoreProductDto.class, restTemplate.getMessageConverters());
         FakeStoreProductDto fakeStoreProductDto =  restTemplate.execute("https://fakestoreapi.com/products/"+id, HttpMethod.PATCH, requestCallback, responseExtractor);
         return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
     }
