@@ -1,9 +1,12 @@
 package com.sk.productservice.controllers;
 
 import com.sk.productservice.dto.ProductDto;
+import com.sk.productservice.exceptions.InvalidInputData;
+import com.sk.productservice.exceptions.ProductNotFoundException;
 import com.sk.productservice.models.Category;
 import com.sk.productservice.models.Product;
 import com.sk.productservice.services.ProductService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +19,7 @@ public class ProductController {
 
     private final ProductService productService;
 
-    ProductController(ProductService productService) {
+    ProductController(@Qualifier("selfProductService") ProductService productService) {
         this.productService = productService;
     }
 
@@ -26,7 +29,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) {
+    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) throws ProductNotFoundException {
         Product product = productService.getProductById(id);
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
@@ -47,8 +50,14 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    public Product updateProduct(@PathVariable("id") Long id, @RequestBody ProductDto productDto) {
-        return productService.updateProduct(id, productDto);
+    public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id, @RequestBody ProductDto productDto) {
+        Product product;
+        try {
+            product = productService.updateProduct(id, productDto);
+            return new ResponseEntity<>(product, HttpStatus.OK);
+        } catch (InvalidInputData | ProductNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")

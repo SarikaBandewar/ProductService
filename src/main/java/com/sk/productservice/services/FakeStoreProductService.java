@@ -15,8 +15,10 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-@Primary
+import static com.sk.productservice.services.SelfProductService.getProduct;
+
+@Service("fakeStoreProductService")
+//@Primary
 public class FakeStoreProductService implements ProductService{
 
     private final RestTemplate restTemplate;
@@ -113,15 +115,7 @@ public class FakeStoreProductService implements ProductService{
     }
 
     private Product convertProductDtoToProduct(ProductDto productDto) {
-        Product product = new Product();
-        product.setTitle(productDto.getTitle());
-        product.setPrice(productDto.getPrice());
-        product.setImage(productDto.getImage());
-        product.setDescription(productDto.getDescription());
-        Category category = new Category();
-        category.setTitle(productDto.getCategory());
-        product.setCategory(category);
-        return product;
+        return getProduct(productDto);
     }
 
     private List<Product> getProducts(ResponseEntity<FakeStoreProductDto[]> fakeStoreProductDtoList) {

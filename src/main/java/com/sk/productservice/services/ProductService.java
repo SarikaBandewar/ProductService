@@ -3,6 +3,8 @@ package com.sk.productservice.services;
 
 import com.sk.productservice.dto.FakeStoreProductDto;
 import com.sk.productservice.dto.ProductDto;
+import com.sk.productservice.exceptions.InvalidInputData;
+import com.sk.productservice.exceptions.ProductNotFoundException;
 import com.sk.productservice.models.Category;
 import com.sk.productservice.models.Product;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 public interface ProductService {
-    Product getProductById(Long id);
+    Product getProductById(Long id) throws ProductNotFoundException;
 
     List<Product> getAllProducts();
 
@@ -23,7 +25,7 @@ public interface ProductService {
 
     Product replaceProduct(Long id, ProductDto productDto);
 
-    Product updateProduct(Long id, ProductDto productDto);
+    Product updateProduct(Long id, ProductDto productDto) throws ProductNotFoundException, InvalidInputData;
 
     Boolean deleteProduct(Long id);
 }
