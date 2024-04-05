@@ -4,6 +4,7 @@ import com.sk.productservice.dto.FakeStoreProductDto;
 import com.sk.productservice.dto.ProductDto;
 import com.sk.productservice.models.Category;
 import com.sk.productservice.models.Product;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Primary
 public class FakeStoreProductService implements ProductService{
 
     private final RestTemplate restTemplate;
