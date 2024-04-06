@@ -21,11 +21,11 @@ public interface ProductService {
 
     List<Product> getProductsOfCategory(String category);
 
-    Product createProduct(ProductDto productDto);
+    Product createProduct(Product product);
 
-    Product replaceProduct(Long id, ProductDto productDto);
+    Product replaceProduct(Long id, Product product);
 
-    Product updateProduct(Long id, ProductDto productDto) throws ProductNotFoundException, InvalidInputData;
+    Product updateProduct(Long id, Product product) throws ProductNotFoundException, InvalidInputData;
 
     Boolean deleteProduct(Long id);
 }

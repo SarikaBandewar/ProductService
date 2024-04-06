@@ -19,7 +19,7 @@ public class ProductController {
 
     private final ProductService productService;
 
-    ProductController(@Qualifier("selfProductService") ProductService productService) {
+    ProductController(@Qualifier("fakeStoreProductService") ProductService productService) {
         this.productService = productService;
     }
 
@@ -45,24 +45,48 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product createProduct(@RequestBody ProductDto productDto) {
-        return productService.createProduct(productDto);
+    public ResponseEntity<Product> createProduct(@RequestBody ProductDto productDto) {
+        Product product = convertProductDtoToProduct(productDto);
+        try {
+//            Product createdProduct = productService.createProduct(product);
+
+            return new ResponseEntity<>(productService.createProduct(product), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private Product convertProductDtoToProduct(ProductDto productDto) {
+        Product product = new Product();
+        product.setTitle(productDto.getTitle());
+        product.setPrice(productDto.getPrice());
+        product.setImage(productDto.getImage());
+        product.setDescription(productDto.getDescription());
+        Category category = new Category();
+        category.setTitle(productDto.getCategory());
+        product.setCategory(category);
+        return product;
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id, @RequestBody ProductDto productDto) {
-        Product product;
+        Product product = convertProductDtoToProduct(productDto);
         try {
-            product = productService.updateProduct(id, productDto);
-            return new ResponseEntity<>(product, HttpStatus.OK);
+            Product createdProduct = productService.updateProduct(id, product);
+            return new ResponseEntity<>(createdProduct, HttpStatus.OK);
         } catch (InvalidInputData | ProductNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/{id}")
-    public Product replaceProduct(@PathVariable("id") Long id, @RequestBody ProductDto productDto) {
-        return productService.replaceProduct(id, productDto);
+    public ResponseEntity<Product> replaceProduct(@PathVariable("id") Long id, @RequestBody ProductDto productDto) {
+        Product product = convertProductDtoToProduct(productDto);
+        try {
+            return new ResponseEntity<>(productService.replaceProduct(id, product), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("/{id}")

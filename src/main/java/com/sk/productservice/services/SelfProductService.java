@@ -1,6 +1,5 @@
 package com.sk.productservice.services;
 
-import com.sk.productservice.dto.ProductDto;
 import com.sk.productservice.exceptions.InvalidInputData;
 import com.sk.productservice.exceptions.ProductNotFoundException;
 import com.sk.productservice.models.Category;
@@ -49,9 +48,8 @@ public class SelfProductService implements ProductService {
     }
 
     @Override
-    public Product createProduct(ProductDto productDto) {
-        Optional<Category> optionalCategory = categoryRepository.findByTitle(productDto.getCategory());
-        Product product = convertProductDtoToProduct(productDto);
+    public Product createProduct(Product product) {
+        Optional<Category> optionalCategory = categoryRepository.findByTitle(product.getCategory().getTitle());
         if (optionalCategory.isEmpty()) {
             Category category = categoryRepository.save(product.getCategory());
             product.setCategory(category);
@@ -62,37 +60,37 @@ public class SelfProductService implements ProductService {
     }
 
     @Override
-    public Product replaceProduct(Long id, ProductDto productDto) {
+    public Product replaceProduct(Long id, Product product) {
         return null;
     }
 
     @Override
-    public Product updateProduct(Long id, ProductDto productDto) throws ProductNotFoundException, InvalidInputData {
+    public Product updateProduct(Long id, Product product) throws ProductNotFoundException, InvalidInputData {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isEmpty()) {
             throw new ProductNotFoundException();
         }
-        if (productDto == null) throw new InvalidInputData();
+        if (product == null) throw new InvalidInputData();
 
         Product currentProduct = optionalProduct.get();
-        if (productDto.getTitle() != null) {
-            currentProduct.setTitle(productDto.getTitle());
+        if (product.getTitle() != null) {
+            currentProduct.setTitle(product.getTitle());
         }
-        if(productDto.getPrice() != null)
-            currentProduct.setPrice(productDto.getPrice());
-        if(productDto.getDescription() != null)
-            currentProduct.setDescription(productDto.getDescription());
-        if(productDto.getCategory() != null) {
-            if(!currentProduct.getCategory().getTitle().equals(productDto.getCategory())) {
-                Optional<Category> optionalCategory = categoryRepository.findByTitle(productDto.getCategory());
+        if(product.getPrice() != null)
+            currentProduct.setPrice(product.getPrice());
+        if(product.getDescription() != null)
+            currentProduct.setDescription(product.getDescription());
+        if(product.getCategory() != null) {
+            if(!currentProduct.getCategory().getTitle().equals(product.getCategory().getTitle())) {
+                Optional<Category> optionalCategory = categoryRepository.findByTitle(product.getCategory().getTitle());
                 if (optionalCategory.isEmpty()) {
                     Category category = categoryRepository.save(currentProduct.getCategory());
                     currentProduct.setCategory(category);
                 }
             }
         }
-        if(productDto.getImage() != null)
-            currentProduct.setImage(productDto.getImage());
+        if(product.getImage() != null)
+            currentProduct.setImage(product.getImage());
 
         return productRepository.save(currentProduct);
     }
@@ -100,21 +98,5 @@ public class SelfProductService implements ProductService {
     @Override
     public Boolean deleteProduct(Long id) {
         return null;
-    }
-
-    private Product convertProductDtoToProduct(ProductDto productDto) {
-        return getProduct(productDto);
-    }
-
-    static Product getProduct(ProductDto productDto) {
-        Product product = new Product();
-        product.setTitle(productDto.getTitle());
-        product.setPrice(productDto.getPrice());
-        product.setImage(productDto.getImage());
-        product.setDescription(productDto.getDescription());
-        Category category = new Category();
-        category.setTitle(productDto.getCategory());
-        product.setCategory(category);
-        return product;
     }
 }
