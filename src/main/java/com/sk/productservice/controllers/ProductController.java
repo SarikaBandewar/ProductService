@@ -19,7 +19,7 @@ public class ProductController {
 
     private final ProductService productService;
 
-    ProductController(@Qualifier("fakeStoreProductService") ProductService productService) {
+    ProductController(@Qualifier("selfProductService") ProductService productService) {
         this.productService = productService;
     }
 
@@ -86,13 +86,19 @@ public class ProductController {
             return new ResponseEntity<>(productService.replaceProduct(id, product), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (InvalidInputData | ProductNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteProduct(@PathVariable Long id) {
-        Boolean response = productService.deleteProduct(id);
-        if (response) return new ResponseEntity<>(HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        try {
+            Boolean response = productService.deleteProduct(id);
+            if (response) return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ProductNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

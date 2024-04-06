@@ -28,23 +28,28 @@ public class SelfProductService implements ProductService {
         if (optionalProduct.isEmpty()) {
             throw new ProductNotFoundException();
         }
-
         return optionalProduct.get();
     }
 
     @Override
     public List<Product> getAllProducts() {
-        return List.of();
+        return productRepository.findAll();
     }
 
     @Override
     public List<Category> getAllCategories() {
-        return List.of();
+        return categoryRepository.findAll();
     }
 
     @Override
     public List<Product> getProductsOfCategory(String category) {
-        return List.of();
+        Optional<Category> optionalCategory = categoryRepository.findByTitle(category);
+        if (optionalCategory.isEmpty()) {
+            return productRepository.findAll();
+        } else {
+            Category categoryObj = optionalCategory.get();
+            return productRepository.findByCategoryId(categoryObj.getId());
+        }
     }
 
     @Override
@@ -60,8 +65,29 @@ public class SelfProductService implements ProductService {
     }
 
     @Override
-    public Product replaceProduct(Long id, Product product) {
-        return null;
+    public Product replaceProduct(Long id, Product product) throws InvalidInputData, ProductNotFoundException {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isEmpty()) {
+            throw new ProductNotFoundException();
+        }
+
+        Product currentProduct = optionalProduct.get();
+        try {
+            currentProduct.setTitle(product.getTitle());
+            currentProduct.setPrice(product.getPrice());
+            currentProduct.setDescription(product.getDescription());
+            Optional<Category> optionalCategory = categoryRepository.findByTitle(product.getCategory().getTitle());
+            if (optionalCategory.isEmpty()) {
+                Category category = categoryRepository.save(product.getCategory());
+                currentProduct.setCategory(category);
+            } else
+                currentProduct.setCategory(optionalCategory.get());
+
+            currentProduct.setImage(product.getImage());
+        } catch (Exception e) {
+            throw new InvalidInputData();
+        }
+        return productRepository.save(currentProduct);
     }
 
     @Override
@@ -73,19 +99,20 @@ public class SelfProductService implements ProductService {
         if (product == null) throw new InvalidInputData();
 
         Product currentProduct = optionalProduct.get();
-        if (product.getTitle() != null) {
+        if (product.getTitle() != null)
             currentProduct.setTitle(product.getTitle());
-        }
         if(product.getPrice() != null)
             currentProduct.setPrice(product.getPrice());
         if(product.getDescription() != null)
             currentProduct.setDescription(product.getDescription());
-        if(product.getCategory() != null) {
+        if(product.getCategory().getTitle() != null) {
             if(!currentProduct.getCategory().getTitle().equals(product.getCategory().getTitle())) {
                 Optional<Category> optionalCategory = categoryRepository.findByTitle(product.getCategory().getTitle());
                 if (optionalCategory.isEmpty()) {
-                    Category category = categoryRepository.save(currentProduct.getCategory());
+                    Category category = categoryRepository.save(product.getCategory());
                     currentProduct.setCategory(category);
+                } else {
+                    currentProduct.setCategory(optionalCategory.get());
                 }
             }
         }
@@ -96,7 +123,12 @@ public class SelfProductService implements ProductService {
     }
 
     @Override
-    public Boolean deleteProduct(Long id) {
-        return null;
+    public Boolean deleteProduct(Long id) throws ProductNotFoundException {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isEmpty()) {
+            throw new ProductNotFoundException();
+        }
+        productRepository.delete(optionalProduct.get());
+        return true;
     }
 }

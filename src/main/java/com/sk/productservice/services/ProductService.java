@@ -23,9 +23,9 @@ public interface ProductService {
 
     Product createProduct(Product product);
 
-    Product replaceProduct(Long id, Product product);
+    Product replaceProduct(Long id, Product product) throws InvalidInputData, ProductNotFoundException;
 
     Product updateProduct(Long id, Product product) throws ProductNotFoundException, InvalidInputData;
 
-    Boolean deleteProduct(Long id);
+    Boolean deleteProduct(Long id) throws ProductNotFoundException;
 }
