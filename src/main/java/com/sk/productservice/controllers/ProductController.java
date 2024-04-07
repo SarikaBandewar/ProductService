@@ -1,5 +1,6 @@
 package com.sk.productservice.controllers;
 
+import com.sk.productservice.dto.ExceptionDto;
 import com.sk.productservice.dto.ProductDto;
 import com.sk.productservice.exceptions.InvalidInputData;
 import com.sk.productservice.exceptions.ProductNotFoundException;
@@ -100,5 +101,12 @@ public class ProductController {
         } catch (ProductNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ExceptionDto> handleProductControllerException() {
+        ExceptionDto exceptionDto = new ExceptionDto();
+        exceptionDto.setMessage("Product not found");
+        return new ResponseEntity<>(exceptionDto, HttpStatus.NOT_FOUND);
     }
 }
