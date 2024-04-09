@@ -6,6 +6,7 @@ import com.sk.productservice.exceptions.InvalidInputData;
 import com.sk.productservice.exceptions.ProductNotFoundException;
 import com.sk.productservice.models.Category;
 import com.sk.productservice.models.Product;
+import com.sk.productservice.services.CategoryService;
 import com.sk.productservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -13,15 +14,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
 
-    ProductController(@Qualifier("selfProductService") ProductService productService) {
+    ProductController(@Qualifier("selfProductService") ProductService productService,
+                      CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping
@@ -63,9 +68,16 @@ public class ProductController {
         product.setPrice(productDto.getPrice());
         product.setImage(productDto.getImage());
         product.setDescription(productDto.getDescription());
-        Category category = new Category();
-        category.setTitle(productDto.getCategory());
-        product.setCategory(category);
+
+        Optional<Category> categoryOptional = categoryService.getCategoryByTitle(product.getTitle());
+
+        if (categoryOptional.isPresent()) {
+            product.setCategory(categoryOptional.get());
+        } else {
+            Category category = new Category();
+            category.setTitle(productDto.getCategory());
+            product.setCategory(category);
+        }
         return product;
     }
 
