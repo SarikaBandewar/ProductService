@@ -18,4 +18,5 @@ public class Category extends BaseModel {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = {CascadeType.REMOVE})
     private List<Product> products;
     private String title;
+    private String description;
 }
