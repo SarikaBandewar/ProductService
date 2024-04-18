@@ -19,17 +19,27 @@ class ProductServiceApplicationTests {
 	}
 
 
-	@Test
-	public void testQueries() {
 
-		Optional<ProductWithIdTitle> product = productRepository.findByProductId(2L);
-		if (product.isPresent()) {
-			System.out.println("id = " + product.get().getId());
-			System.out.println("title = " + product.get().getTitle());
-		} else {
-			System.out.println("id = null");
-		}
-	}
+
+
+
+
+
+
+
+
+//
+//	@Test
+//	public void testQueries() {
+//
+//		Optional<ProductWithIdTitle> product = productRepository.findByProductId(2L);
+//		if (product.isPresent()) {
+//			System.out.println("id = " + product.get().getId());
+//			System.out.println("title = " + product.get().getTitle());
+//		} else {
+//			System.out.println("id = null");
+//		}
+//	}
 
 
 }
