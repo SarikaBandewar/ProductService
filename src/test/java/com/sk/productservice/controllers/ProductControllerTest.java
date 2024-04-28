@@ -35,11 +35,11 @@ class ProductControllerTest {
         category.setTitle("Category1");
         product.setCategory(category);
 
-        when(productService.getProductById(1L)).thenReturn(product);
+        when(productService.getProductById(10L)).thenReturn(product);
 
         ResponseEntity<Product> expectedResponse = new ResponseEntity<>(product, HttpStatus.OK);
 
-        ResponseEntity<Product> actualResponse = productController.getProductById(1L);
+        ResponseEntity<Product> actualResponse = productController.getProductById(10L);
 
         assertEquals(expectedResponse.getBody(), actualResponse.getBody());
         assertEquals(expectedResponse.getStatusCode(), actualResponse.getStatusCode());

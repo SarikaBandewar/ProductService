@@ -1,7 +1,10 @@
 package com.sk.productservice.controllers;
 
+import com.sk.productservice.commons.AuthenticationCommons;
 import com.sk.productservice.dto.ExceptionDto;
 import com.sk.productservice.dto.ProductDto;
+import com.sk.productservice.dto.Role;
+import com.sk.productservice.dto.UserDto;
 import com.sk.productservice.exceptions.InvalidInputData;
 import com.sk.productservice.exceptions.ProductNotFoundException;
 import com.sk.productservice.models.Category;
@@ -22,16 +25,35 @@ public class ProductController {
 
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final AuthenticationCommons authenticationCommons;
 
     ProductController(@Qualifier("selfProductService") ProductService productService,
-                      CategoryService categoryService) {
+                      CategoryService categoryService, AuthenticationCommons authenticationCommons) {
         this.productService = productService;
         this.categoryService = categoryService;
+        this.authenticationCommons = authenticationCommons;
     }
 
-    @GetMapping
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
+    @GetMapping("/all/{token}")
+    public ResponseEntity<List<Product>> getAllProducts(@PathVariable String token) {
+        // validate the token using UserService
+        UserDto userDto = authenticationCommons.validateToken(token);
+
+        if(userDto == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+//        boolean isAdmin = false;
+//        for(Role role : userDto.getRoles()) {
+//            if (role.getName().equalsIgnoreCase("admin")) {
+//                isAdmin = true;
+//                break;
+//            }
+//        }
+
+//        if (!isAdmin) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
